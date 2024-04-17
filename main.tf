@@ -43,7 +43,7 @@ resource "azurerm_public_ip" "pub" {
     environment = "Non Production"
   }
 }
-  resource "azurerm_subnet" "vnet2" {
+resource "azurerm_subnet" "vnet2" {
   name                 = "nonprodapp"
   resource_group_name  = azurerm_resource_group.rg.name
   virtual_network_name = azurerm_virtual_network.vnet.name
@@ -159,38 +159,20 @@ resource "azurerm_virtual_machine" "server2" {
 
 #Load balencer
 
- resource "azurerm_public_ip" "pub3" {
-  name                = "public3"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = "South India"
-  allocation_method   = "Static"
-
-  tags = {
-    environment = "Non Production"
-  }
-}
-resource "azurerm_public_ip" "publicLB" {
-  name                = "PublicIPForLB"
+resource "azurerm_public_ip" "pub4" {
+  name                = "publicip4"
   location            = "South India"
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static"
 }
-resource "azurerm_lb" "LB" {
-  name                = "LB-NonProd"
+
+resource "azurerm_lb" "NonprodLB" {
+  name                = "Nonprod-lb"
   location            = "South India"
   resource_group_name = azurerm_resource_group.rg.name
 
-    frontend_ip_configuration {
-    name                 = "PublicLB"
-    public_ip_address_id = azurerm_public_ip.pub3.id
+  frontend_ip_configuration {
+    name                 = "ingress"
+    public_ip_address_id = azurerm_public_ip.pub4.id
   }
-}
-resource "azurerm_lb_backend_address_pool" "PrivateLB" {
-  loadbalancer_id = azurerm_lb.LB.id
-  name            = "Banckebndpool"
-  }
-resource "azurerm_network_interface_backend_address_pool_association" "example" {
-  network_interface_id    = azurerm_network_interface.app.id
-  ip_configuration_name   = "testconfiguration1"
-  backend_address_pool_id = azurerm_lb_backend_address_pool.PrivateLB.id
 }
